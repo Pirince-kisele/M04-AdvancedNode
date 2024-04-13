@@ -1,19 +1,46 @@
-const express = require("express");
-const _ = require("lodash");
+const http = require("http");
 const fs = require("fs");
+const path = require("path");
 
-const app = express();
-const num = _.random(1, 10);
-console.log(num);
+const server = http.createServer((req, res) => {
+  // set header content type
+  res.writeHead(200, { "Content-Type": "text/html" });
 
-const greet = _.once(() => {
-  console.log(`Hello`);
+  //send an html file
+  let path = "./views/";
+
+  switch (req.url) {
+    case "/":
+      path += "index.html";
+      res.stautsCode = 200;
+      break;
+    case "/about":
+      path += "about.html";
+      res.stautsCode = 200;
+      break;
+    case "/about-me":
+      res.stautsCode = 301;
+      res.setHeader("Location", "/about");
+      res.end();
+      break;
+    default:
+      path += "404.html";
+      res.stautsCode = 404;
+      break;
+  }
+  fs.readFile(path, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.end();
+    } else {
+      // res.write(data);
+      res.end(data);
+    }
+  });
 });
-greet();
-greet();
 
-app.listen(3000),
+server.listen(3000),
   "localHost",
   () => {
-    console.log("Server is running on the port 3000");
+    console.log("Server is running on port 3000");
   };
